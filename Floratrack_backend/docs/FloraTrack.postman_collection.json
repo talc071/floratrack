@@ -1,0 +1,593 @@
+{
+  "info": {
+    "_postman_id": "floratrack-api-v1",
+    "name": "FloraTrack API",
+    "description": "Complete REST API collection for FloraTrack – Digital Plant Care Companion.\n\nBase URL: http://localhost:3000\n\nRole-based access is simulated via the `x-user-role` header. Accepted values: admin | manager | user",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/users",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["users"]
+            }
+          }
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/users/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["users", "1"]
+            }
+          }
+        },
+        {
+          "name": "Get User by ID – 404 Not Found",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/users/999",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["users", "999"]
+            }
+          }
+        },
+        {
+          "name": "Get Plants by User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/users/3/plants",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["users", "3", "plants"]
+            }
+          }
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-user-role", "value": "admin" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Frank\",\n  \"lastName\": \"Petal\",\n  \"userRole\": \"user\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "http://localhost:3000/users",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["users"]
+            }
+          }
+        },
+        {
+          "name": "Create User – 400 Validation Error (missing fields)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-user-role", "value": "admin" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Frank\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "http://localhost:3000/users",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["users"]
+            }
+          }
+        },
+        {
+          "name": "Create User – 403 Forbidden (wrong role)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-user-role", "value": "user" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Frank\",\n  \"lastName\": \"Petal\",\n  \"userRole\": \"user\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "http://localhost:3000/users",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["users"]
+            }
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-user-role", "value": "admin" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Alice\",\n  \"lastName\": \"Greenwood\",\n  \"userRole\": \"admin\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "http://localhost:3000/users/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["users", "1"]
+            }
+          }
+        },
+        {
+          "name": "Update User – 403 Forbidden (user role)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-user-role", "value": "user" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Carol\",\n  \"lastName\": \"Rose\",\n  \"userRole\": \"user\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "http://localhost:3000/users/3",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["users", "3"]
+            }
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "x-user-role", "value": "admin" }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/users/5",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["users", "5"]
+            }
+          }
+        },
+        {
+          "name": "Delete User – 403 Forbidden (manager role)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "x-user-role", "value": "manager" }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/users/4",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["users", "4"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Plants",
+      "item": [
+        {
+          "name": "Get All Plants",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/plants",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["plants"]
+            }
+          }
+        },
+        {
+          "name": "Get All Plants – filter by healthStatus",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/plants?healthStatus=needs-attention",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["plants"],
+              "query": [
+                { "key": "healthStatus", "value": "needs-attention" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Plants – filter by userId",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/plants?userId=3",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["plants"],
+              "query": [
+                { "key": "userId", "value": "3" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Plants – filter by location",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/plants?location=Bedroom",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["plants"],
+              "query": [
+                { "key": "location", "value": "Bedroom" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Plant by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/plants/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["plants", "1"]
+            }
+          }
+        },
+        {
+          "name": "Get Plant by ID – 404 Not Found",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/plants/999",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["plants", "999"]
+            }
+          }
+        },
+        {
+          "name": "Create Plant",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-user-role", "value": "user" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 3,\n  \"name\": \"Pothos\",\n  \"species\": \"Epipremnum aureum\",\n  \"location\": \"Hallway\",\n  \"wateringFrequencyDays\": 7,\n  \"healthStatus\": \"healthy\",\n  \"notes\": \"Very resilient plant, great for beginners.\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "http://localhost:3000/plants",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["plants"]
+            }
+          }
+        },
+        {
+          "name": "Create Plant – 400 Validation Error (missing fields)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-user-role", "value": "user" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Pothos\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "http://localhost:3000/plants",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["plants"]
+            }
+          }
+        },
+        {
+          "name": "Create Plant – 403 Forbidden (no role header)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 3,\n  \"name\": \"Pothos\",\n  \"species\": \"Epipremnum aureum\",\n  \"location\": \"Hallway\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "http://localhost:3000/plants",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["plants"]
+            }
+          }
+        },
+        {
+          "name": "Update Plant",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-user-role", "value": "manager" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Peace Lily\",\n  \"species\": \"Spathiphyllum wallisii\",\n  \"location\": \"Office\",\n  \"wateringFrequencyDays\": 4,\n  \"healthStatus\": \"healthy\",\n  \"notes\": \"Recovered after adjusting watering schedule.\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "http://localhost:3000/plants/3",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["plants", "3"]
+            }
+          }
+        },
+        {
+          "name": "Update Plant – 403 Forbidden (user role)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-user-role", "value": "user" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Monstera\",\n  \"species\": \"Monstera deliciosa\",\n  \"location\": \"Living Room\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "http://localhost:3000/plants/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["plants", "1"]
+            }
+          }
+        },
+        {
+          "name": "Delete Plant",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "x-user-role", "value": "admin" }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/plants/6",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["plants", "6"]
+            }
+          }
+        },
+        {
+          "name": "Delete Plant – 403 Forbidden (manager role)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "x-user-role", "value": "manager" }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/plants/5",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["plants", "5"]
+            }
+          }
+        },
+        {
+          "name": "Delete Plant – 404 Not Found",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "x-user-role", "value": "admin" }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/plants/999",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["plants", "999"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"alice@floratrack.com\",\n  \"password\": \"admin123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "http://localhost:3000/api/auth/login", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "auth", "login"] }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "http://localhost:3000/api/auth/logout", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "auth", "logout"] }
+          }
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "x-user-role", "value": "admin" },
+              { "key": "x-user-id", "value": "1" }
+            ],
+            "url": { "raw": "http://localhost:3000/api/users/me", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "users", "me"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Settings",
+      "item": [
+        {
+          "name": "Get Settings",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "x-user-role", "value": "user" },
+              { "key": "x-user-id", "value": "3" }
+            ],
+            "url": { "raw": "http://localhost:3000/api/settings", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "settings"] }
+          }
+        },
+        {
+          "name": "Update Settings",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-user-role", "value": "user" },
+              { "key": "x-user-id", "value": "3" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"displayName\": \"Carol Rose\",\n  \"email\": \"carol@floratrack.com\",\n  \"theme\": \"light\",\n  \"language\": \"English\",\n  \"notificationsEnabled\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "http://localhost:3000/api/settings", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "settings"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Care Logs",
+      "item": [
+        {
+          "name": "Log Watering",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-user-role", "value": "user" },
+              { "key": "x-user-id", "value": "3" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plantId\": 1,\n  \"actionType\": \"watering\",\n  \"notes\": \"\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "http://localhost:3000/api/care-logs", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "care-logs"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "AI",
+      "item": [
+        {
+          "name": "Identify Plant (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "x-user-role", "value": "user" },
+              { "key": "x-user-id", "value": "3" }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [{ "key": "image", "type": "file", "src": [] }]
+            },
+            "url": { "raw": "http://localhost:3000/api/ai/identify", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["api", "ai", "identify"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Relational Queries",
+      "item": [
+        {
+          "name": "Get Plant History (JOIN)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "http://localhost:3000/plants/1/history", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["plants", "1", "history"] }
+          }
+        }
+      ]
+    }
+  ]
+}

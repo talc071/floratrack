@@ -1,0 +1,34 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --color-primary: #2d7a4f;
+  --color-primary-light: #4caf50;
+  --color-primary-dark: #1b5e35;
+  --color-bg: #f0f4f0;
+  --color-surface: #ffffff;
+  --color-text: #1a2e1a;
+  --color-text-muted: #5a7a5a;
+  --color-border: #d0e0d0;
+  --color-error: #d32f2f;
+  --color-warning: #f57c00;
+  --color-success: #2e7d32;
+  --radius: 8px;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--color-primary); text-decoration: none; }
+button { cursor: pointer; font-family: inherit; }
+input, select, textarea { font-family: inherit; }
+h1, h2, h3, h4 { color: var(--color-text); margin-top: 0; }

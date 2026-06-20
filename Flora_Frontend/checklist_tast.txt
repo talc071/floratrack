@@ -1,0 +1,96 @@
+====================================================================
+COMPREHENSIVE TESTING CHECKLIST - FULL STACK INTEGRATION ASSIGNMENT
+====================================================================
+
+--------------------------------------------------------------------
+1. PERSISTENCE & ORM INTEGRATION TESTS (Database Layer)
+--------------------------------------------------------------------
+[ ] Server Restart Test (Data Persistence)
+    - Action: Insert a new record (e.g., create a user/resource) via the frontend.
+    - Action: Shut down the Node.js backend server completely, then restart it.
+    - Action: Refresh the frontend client application.
+    - Expected Result: The data must still load and display perfectly, proving it persists in the MySQL database and does not clear out.
+
+[ ] Complete CRUD Validation Test
+    - CREATE: Test adding a new record. Verify it shows up in the UI and creates a new row in the MySQL table.
+    - READ: Verify that existing records fetch automatically on page load.
+    - UPDATE: Modify an existing record's fields. Verify the changes save to the database and update on the UI.
+    - DELETE: Delete a record. Verify it is fully removed from the UI and deleted from the database table.
+
+[ ] ORM Schema Relationship Test (1:N and M:N)
+    - Action: Perform actions that involve related tables (e.g., assign a resource to a user, or map an action to an Admin).
+    - Expected Result: The application successfully handles foreign key relationships. Check the terminal/console to ensure the ORM is executing valid JOIN queries without crashes.
+
+--------------------------------------------------------------------
+2. WEBSOCKET REAL-TIME TESTS (Socket.IO Layer)
+--------------------------------------------------------------------
+[ ] Multi-Client Synchronization Test
+    - Action: Open the application in two separate, side-by-side browser windows (e.g., Chrome normal window and an Incognito window).
+    - Action: Trigger a real-time feature in Window A (e.g., send a message, trigger a notification, or update a dashboard status).
+    - Expected Result: Window B must reflect the update instantly in its UI without requiring a manual page refresh.
+
+[ ] Custom Events Integrity Test
+    - Action: Review your frontend and backend socket code files.
+    - Expected Result: Verify that you have explicitly named and handled at least 3 custom events (e.g., "send-message", "typing-state", "data-alert") entirely separate from the built-in "connect" and "disconnect" events.
+
+--------------------------------------------------------------------
+3. AI SERVICE INTEGRATION TESTS (AI Layer)
+--------------------------------------------------------------------
+[ ] Architecture & Security Gateway Test
+    - Action: Open the browser's Developer Tools (F12) and switch to the Network Tab.
+    - Action: Trigger the AI-powered feature from the frontend UI.
+    - Action: Inspect the outgoing HTTP request network log.
+    - Expected Result: The request URL must point directly to your local Express backend endpoint. The client must never make a direct fetch request to external AI provider endpoints (e.g., OpenAI API, Gemini API).
+
+[ ] Source Code Secret Key Scan
+    - Action: Run a global search (Ctrl+F or Cmd+F) inside your entire "frontend/" directory for keywords like "api-key", "secret", "sk-", or token variables.
+    - Expected Result: Zero matches found. All sensitive provider tokens must reside strictly within the server-side backend ".env" file.
+
+[ ] Domain Context Test
+    - Action: Input data into your AI feature.
+    - Expected Result: The AI output must be contextually relevant and useful to your specific project domain (e.g., summarizing actual database entities or generating project-relevant recommendations) rather than acting as a completely generic chatbot.
+
+--------------------------------------------------------------------
+4. API COMMUNICATION & INTERFACES TESTS (Standardization Layer)
+--------------------------------------------------------------------
+[ ] Success Response Layout Test
+    - Action: Use Postman or your frontend client to trigger a successful API call (HTTP 200 OK).
+    - Expected Result: The JSON body must exactly match this layout:
+      {
+        "success": true,
+        "data": { ... your data object here ... },
+        "error": null
+      }
+
+[ ] Error Response Layout Test
+    - Action: Send an intentionally broken request to your API endpoints (e.g., pass an invalid ID, empty required strings, or trigger a 404/500 error route).
+    - Expected Result: The response status code must be a proper error code (4xx or 5xx) and the JSON body must exactly match this layout:
+      {
+        "success": false,
+        "data": null,
+        "error": {
+          "code": "SOME_ERROR_CODE_STRING",
+          "message": "Human readable message explaining what went wrong",
+          "details": { ... extra debugging fields or empty object ... }
+        }
+      }
+
+--------------------------------------------------------------------
+5. PRE-SUBMISSION SANITY CHECKS (Deployment & Structure Layer)
+--------------------------------------------------------------------
+[ ] Project Structure Verification
+    - Action: Inspect your root folder layout.
+    - Expected Result: Verify folders are organized precisely as requested:
+      ├── frontend/src/
+      ├── backend/src/
+      ├── backend/models/
+      └── backend/migrations/
+
+[ ] Submission Archive Inspection
+    - Action: Create your final submission ZIP folder and open it up to audit the files inside.
+    - [ ] Confirm: "node_modules/" folders are excluded.
+    - [ ] Confirm: Production ".env" files containing active keys or local passwords are excluded.
+    - [ ] Confirm: An ".env.example" file with empty placeholder strings is present.
+    - [ ] Confirm: A valid exported Postman Collection JSON file is included.
+    - [ ] Confirm: Your project walkthrough Demo Video is attached.
+    - [ ] Confirm: All 6 mandatory functional screenshots are included in the root or a dedicated images directory.
