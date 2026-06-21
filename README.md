@@ -106,7 +106,8 @@ App: **http://localhost:3001**
 | `DB_USER` | MySQL username |
 | `DB_PASSWORD` | MySQL password |
 | `CORS_ORIGIN` | Frontend URL (`http://localhost:3001`) |
-| `GEMINI_API_KEY` | Google Gemini API key for AI (optional for dev) |
+| `ANTHROPIC_API_KEY` | Anthropic Claude API key for AI identification (primary, optional) |
+| `GEMINI_API_KEY` | Google Gemini API key for AI identification (fallback, optional) |
 
 ### Frontend (`Flora_Frontend/.env.example`)
 
@@ -214,12 +215,22 @@ Real-time plant activity notifications sync across browser tabs.
 
 **Endpoint:** `POST /api/ai/identify` (multipart form, field: `image`)
 
-- Frontend sends image to Express backend only — **never directly to Gemini**
-- Backend uses `GEMINI_API_KEY` from `.env`
+- Frontend sends image to Express backend only — **API keys are never exposed to the browser**
+- Backend tries providers in order: **Claude → Gemini → mock fallback**
+- Set `ANTHROPIC_API_KEY` in `Floratrack_backend/.env` for Claude (`claude-sonnet-4-6`)
+- Set `GEMINI_API_KEY` in `Floratrack_backend/.env` for Gemini (`gemini-1.5-flash`) as backup
 - Returns standardized JSON with species, confidence, watering frequency, and care instructions
-- Returns `503 AI_UNAVAILABLE` if no API key is configured
+- Returns `503 AI_UNAVAILABLE` if neither API key is configured
+- Response includes a `source` field: `"claude"`, `"gemini"`, or `"fallback"`
 
 On **Add Plant**, upload a photo and click **Identify Plant**.
+
+### Getting API Keys
+
+| Provider | Console | Key variable |
+|----------|---------|--------------|
+| Anthropic Claude | [console.anthropic.com](https://console.anthropic.com) → API Keys | `ANTHROPIC_API_KEY` |
+| Google Gemini | [aistudio.google.com](https://aistudio.google.com) → API Keys | `GEMINI_API_KEY` |
 
 ---
 
@@ -302,7 +313,7 @@ npm run test:checklist
 
 - Authentication uses header-based roles (`x-user-role`, `x-user-id`) after login — no JWT/session cookies
 - Passwords stored in plain text for demo purposes only
-- AI identification requires a valid `GEMINI_API_KEY`; without it the endpoint returns `503`
+- AI identification requires a valid `ANTHROPIC_API_KEY` or `GEMINI_API_KEY`; without either the endpoint returns `503`
 - MySQL must be running before starting the server or seed script
 - Real-time events broadcast to all dashboard subscribers (no per-user filtering)
 - Edit/delete plant UI requires admin or manager role (matches backend authorization)
