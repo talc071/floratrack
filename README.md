@@ -106,8 +106,9 @@ App: **http://localhost:3001**
 | `DB_USER` | MySQL username |
 | `DB_PASSWORD` | MySQL password |
 | `CORS_ORIGIN` | Frontend URL (`http://localhost:3001`) |
-| `ANTHROPIC_API_KEY` | Anthropic Claude API key for AI identification (primary, optional) |
-| `GEMINI_API_KEY` | Google Gemini API key for AI identification (fallback, optional) |
+| `PLANT_ID_API_KEY` | Plant.id v3 API key for AI identification (primary, optional) |
+| `ANTHROPIC_API_KEY` | Anthropic Claude API key for AI identification (fallback 2, optional) |
+| `GEMINI_API_KEY` | Google Gemini API key for AI identification (fallback 1, optional) |
 
 ### Frontend (`Flora_Frontend/.env.example`)
 
@@ -216,9 +217,10 @@ Real-time plant activity notifications sync across browser tabs.
 **Endpoint:** `POST /api/ai/identify` (multipart form, field: `image`)
 
 - Frontend sends image to Express backend only — **API keys are never exposed to the browser**
-- Backend tries providers in order: **Claude → Gemini → mock fallback**
-- Set `ANTHROPIC_API_KEY` in `Floratrack_backend/.env` for Claude (`claude-sonnet-4-6`)
-- Set `GEMINI_API_KEY` in `Floratrack_backend/.env` for Gemini (`gemini-1.5-flash`) as backup
+- Backend tries providers in order: **Plant.id → Gemini → Claude → mock fallback**
+- Set `PLANT_ID_API_KEY` in `Floratrack_backend/.env` for Plant.id v3 (primary — returns species, confidence, watering, care details)
+- Set `GEMINI_API_KEY` in `Floratrack_backend/.env` for Gemini (`gemini-1.5-flash`) as first fallback
+- Set `ANTHROPIC_API_KEY` in `Floratrack_backend/.env` for Claude (`claude-sonnet-4-6`) as second fallback
 - Returns standardized JSON with species, confidence, watering frequency, and care instructions
 - Returns `503 AI_UNAVAILABLE` if neither API key is configured
 - Response includes a `source` field: `"claude"`, `"gemini"`, or `"fallback"`
@@ -229,8 +231,9 @@ On **Add Plant**, upload a photo and click **Identify Plant**.
 
 | Provider | Console | Key variable |
 |----------|---------|--------------|
-| Anthropic Claude | [console.anthropic.com](https://console.anthropic.com) → API Keys | `ANTHROPIC_API_KEY` |
+| Plant.id v3 | [web.plant.id](https://web.plant.id) → API Access | `PLANT_ID_API_KEY` |
 | Google Gemini | [aistudio.google.com](https://aistudio.google.com) → API Keys | `GEMINI_API_KEY` |
+| Anthropic Claude | [console.anthropic.com](https://console.anthropic.com) → API Keys | `ANTHROPIC_API_KEY` |
 
 ---
 

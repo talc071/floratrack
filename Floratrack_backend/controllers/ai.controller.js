@@ -42,47 +42,49 @@ const parseAIResponse = (text) => {
   return JSON.parse(jsonMatch[0]);
 };
 
-const identifyWithClaude = async (imageBuffer, mimeType) => {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey || apiKey === 'your_anthropic_api_key_here') {
-    return null;
+const identifyWithPlantId = async (imageBuffer, mimeType) => {
+  const apiKey = process.env.PLANT_ID_API_KEY;
+  if (!apiKey || apiKey === 'your_plant_id_api_key_here') return null;
+
+  const base64 = `data:${mimeType || 'image/jpeg'};base64,${imageBuffer.toString('base64')}`;
+
+  const response = await fetch(
+    'https://plant.id/api/v3/identification?details=common_names,url,description,taxonomy,watering&language=en&similar_images=true',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Api-Key': apiKey
+      },
+      body: JSON.stringify({ images: [base64], similar_images: true })
+    }
+  );
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Plant.id API error ${response.status}: ${errText}`);
   }
 
-  const client = new Anthropic({ apiKey });
+  const data = await response.json();
+  const suggestion = data.result?.classification?.suggestions?.[0];
+  if (!suggestion) return null;
 
-  const response = await client.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 1024,
-    messages: [
-      {
-        role: 'user',
-        content: [
-          {
-            type: 'image',
-            source: {
-              type: 'base64',
-              media_type: mimeType || 'image/jpeg',
-              data: imageBuffer.toString('base64')
-            }
-          },
-          {
-            type: 'text',
-            text: PLANT_ID_PROMPT
-          }
-        ]
-      }
-    ]
-  });
+  const details = suggestion.details || {};
+  const wateringRaw = details.watering?.max ?? details.watering?.min ?? null;
+  const wateringFrequencyDays = wateringRaw ? Math.round(7 / Math.max(wateringRaw, 1)) : 7;
 
-  const text = response.content[0].text;
-  return parseAIResponse(text);
+  return {
+    commonName: (details.common_names && details.common_names[0]) || suggestion.name,
+    species: suggestion.name,
+    confidence: suggestion.probability,
+    wateringFrequencyDays,
+    careInstructions: details.description?.value || 'No care instructions available.'
+  };
 };
 
 const identifyWithGemini = async (imageBuffer, mimeType) => {
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey || apiKey === 'your_gemini_api_key_here') {
-    return null;
-  }
+  if (!apiKey || apiKey === 'your_gemini_api_key_here') return null;
 
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
@@ -101,6 +103,37 @@ const identifyWithGemini = async (imageBuffer, mimeType) => {
   return parseAIResponse(text);
 };
 
+const identifyWithClaude = async (imageBuffer, mimeType) => {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey || apiKey === 'your_anthropic_api_key_here') return null;
+
+  const client = new Anthropic({ apiKey });
+
+  const response = await client.messages.create({
+    model: 'claude-sonnet-4-6',
+    max_tokens: 1024,
+    messages: [
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'image',
+            source: {
+              type: 'base64',
+              media_type: mimeType || 'image/jpeg',
+              data: imageBuffer.toString('base64')
+            }
+          },
+          { type: 'text', text: PLANT_ID_PROMPT }
+        ]
+      }
+    ]
+  });
+
+  const text = response.content[0].text;
+  return parseAIResponse(text);
+};
+
 const identifyPlant = async (req, res) => {
   try {
     if (!req.file) {
@@ -111,10 +144,10 @@ const identifyPlant = async (req, res) => {
     let source = 'mock';
 
     try {
-      identification = await identifyWithClaude(req.file.buffer, req.file.mimetype);
-      if (identification) source = 'claude';
+      identification = await identifyWithPlantId(req.file.buffer, req.file.mimetype);
+      if (identification) source = 'plant.id';
     } catch (err) {
-      console.warn('[AI] Claude call failed, trying Gemini:', err.message);
+      console.warn('[AI] Plant.id call failed, trying Gemini:', err.message);
     }
 
     if (!identification) {
@@ -122,15 +155,25 @@ const identifyPlant = async (req, res) => {
         identification = await identifyWithGemini(req.file.buffer, req.file.mimetype);
         if (identification) source = 'gemini';
       } catch (err) {
-        console.warn('[AI] Gemini call failed, using fallback:', err.message);
+        console.warn('[AI] Gemini call failed, trying Claude:', err.message);
       }
     }
 
     if (!identification) {
-      const claudeConfigured = process.env.ANTHROPIC_API_KEY && process.env.ANTHROPIC_API_KEY !== 'your_anthropic_api_key_here';
+      try {
+        identification = await identifyWithClaude(req.file.buffer, req.file.mimetype);
+        if (identification) source = 'claude';
+      } catch (err) {
+        console.warn('[AI] Claude call failed, using fallback:', err.message);
+      }
+    }
+
+    if (!identification) {
+      const plantIdConfigured = process.env.PLANT_ID_API_KEY && process.env.PLANT_ID_API_KEY !== 'your_plant_id_api_key_here';
       const geminiConfigured = process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'your_gemini_api_key_here';
-      if (!claudeConfigured && !geminiConfigured) {
-        return sendError(res, 503, 'AI_UNAVAILABLE', 'AI service is not configured. Set ANTHROPIC_API_KEY or GEMINI_API_KEY in backend .env.', {});
+      const claudeConfigured = process.env.ANTHROPIC_API_KEY && process.env.ANTHROPIC_API_KEY !== 'your_anthropic_api_key_here';
+      if (!plantIdConfigured && !geminiConfigured && !claudeConfigured) {
+        return sendError(res, 503, 'AI_UNAVAILABLE', 'AI service is not configured. Set PLANT_ID_API_KEY, GEMINI_API_KEY, or ANTHROPIC_API_KEY in backend .env.', {});
       }
       identification = MOCK_SPECIES[Math.floor(Math.random() * MOCK_SPECIES.length)];
       source = 'fallback';
