@@ -338,6 +338,81 @@ npm run test:checklist
 
 ---
 
+## Deployment (AWS RDS + Render)
+
+The project is configured for deployment with **AWS RDS** (MySQL database) and **Render** (backend + frontend). A `render.yaml` at the project root defines both services automatically.
+
+### Prerequisites
+
+- AWS account with an RDS MySQL 8 instance running (endpoint, credentials ready)
+- Render account connected to your GitHub repository
+- Code pushed to GitHub
+
+### Step 1 — AWS RDS Setup
+
+Create an RDS MySQL 8 instance with **Public access: Yes** and open inbound port `3306` (`0.0.0.0/0`) in its security group.
+
+After creation you will have:
+- **Endpoint** — e.g. `floratrack.xxxx.eu-north-1.rds.amazonaws.com` → use as `DB_HOST`
+- **Master username** → use as `DB_USER`
+- **Master password** → use as `DB_PASSWORD`
+
+### Step 2 — Push to GitHub
+
+```bash
+git add .
+git commit -m "add deployment config"
+git push
+```
+
+### Step 3 — Deploy on Render
+
+1. Go to [render.com](https://render.com) → **New → Blueprint**
+2. Connect your GitHub repository — Render reads `render.yaml` and creates both services
+3. In the **floratrack-backend** service, set these secret environment variables:
+
+| Variable | Value |
+|----------|-------|
+| `DB_PASSWORD` | Your RDS master password |
+| `CORS_ORIGIN` | `https://floratrack-frontend.onrender.com` (set after frontend deploys) |
+| `PLANT_ID_API_KEY` | Your Plant.id API key |
+| `ANTHROPIC_API_KEY` | Your Anthropic API key |
+| `GEMINI_API_KEY` | Your Gemini API key |
+
+4. In the **floratrack-frontend** service, set:
+
+| Variable | Value |
+|----------|-------|
+| `REACT_APP_API_BASE_URL` | `https://floratrack-backend.onrender.com` |
+| `REACT_APP_SOCKET_URL` | `https://floratrack-backend.onrender.com` |
+
+### Step 4 — First deploy: schema creation
+
+`DB_SYNC=true` is set in `render.yaml` for the first deploy — Sequelize will automatically create all tables in RDS.
+
+After the first successful deploy:
+1. In Render dashboard → floratrack-backend → Environment
+2. Change `DB_SYNC` from `true` to `false`
+3. Click **Save Changes** (triggers a redeploy)
+
+### Step 5 — Seed demo data (optional)
+
+In Render dashboard → floratrack-backend → **Shell** tab:
+
+```bash
+npm run db:seed
+```
+
+### Live URLs (after deployment)
+
+| Service | URL |
+|---------|-----|
+| Frontend | `https://floratrack-frontend.onrender.com` |
+| Backend API | `https://floratrack-backend.onrender.com` |
+| Health check | `https://floratrack-backend.onrender.com/health` |
+
+---
+
 ## Assignment 4 Compliance
 
 | Requirement | Status |

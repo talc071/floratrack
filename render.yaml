@@ -1,0 +1,57 @@
+services:
+  # ─── Backend: Node.js API + Socket.IO ───────────────────────────────────────
+  - type: web
+    name: floratrack-backend
+    runtime: node
+    rootDir: Floratrack_backend
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # AWS RDS (eu-north-1)
+      - key: DB_HOST
+        value: floratrack.czw0y64eue0s.eu-north-1.rds.amazonaws.com
+      - key: DB_PORT
+        value: 3306
+      - key: DB_NAME
+        value: floratrack
+      - key: DB_USER
+        value: admin
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_LOGGING
+        value: false
+      # Set to true on first deploy only — creates the schema in RDS automatically
+      # After first successful deploy, change this back to false and redeploy
+      - key: DB_SYNC
+        value: true
+      # Set to the Render frontend URL after the frontend service is deployed
+      - key: CORS_ORIGIN
+        sync: false
+      # AI provider keys
+      - key: PLANT_ID_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+
+  # ─── Frontend: React static site ────────────────────────────────────────────
+  - type: web
+    name: floratrack-frontend
+    runtime: static
+    rootDir: Flora_Frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: build
+    envVars:
+      # Set both to your backend Render URL (e.g. https://floratrack-backend.onrender.com)
+      - key: REACT_APP_API_BASE_URL
+        sync: false
+      - key: REACT_APP_SOCKET_URL
+        sync: false
+    routes:
+      # React Router — send all paths to index.html
+      - type: rewrite
+        source: /*
+        destination: /index.html
