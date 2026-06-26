@@ -25,7 +25,7 @@ services:
       - key: DB_SYNC
         value: false
       - key: CORS_ORIGIN
-        value: https://floratrack-frontend.onrender.com
+        value: https://floratrack-1.onrender.com
       # AI provider keys
       - key: PLANT_ID_API_KEY
         sync: false
