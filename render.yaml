@@ -22,13 +22,10 @@ services:
         sync: false
       - key: DB_LOGGING
         value: false
-      # Set to true on first deploy only — creates the schema in RDS automatically
-      # After first successful deploy, change this back to false and redeploy
       - key: DB_SYNC
-        value: true
-      # Set to the Render frontend URL after the frontend service is deployed
+        value: false
       - key: CORS_ORIGIN
-        sync: false
+        value: https://floratrack-frontend.onrender.com
       # AI provider keys
       - key: PLANT_ID_API_KEY
         sync: false
@@ -45,11 +42,10 @@ services:
     buildCommand: npm install && npm run build
     staticPublishPath: build
     envVars:
-      # Set both to your backend Render URL (e.g. https://floratrack-backend.onrender.com)
       - key: REACT_APP_API_BASE_URL
-        sync: false
+        value: https://floratrack.onrender.com
       - key: REACT_APP_SOCKET_URL
-        sync: false
+        value: https://floratrack.onrender.com
     routes:
       # React Router — send all paths to index.html
       - type: rewrite
