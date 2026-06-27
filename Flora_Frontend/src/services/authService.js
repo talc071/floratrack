@@ -2,6 +2,13 @@ import { post, get } from './api';
 
 const SESSION_KEY = 'floratrack_session';
 
+export const register = async ({ firstName, lastName, email, password }) => {
+  const { ok, data } = await post('/api/auth/register', { firstName, lastName, email, password });
+  if (!ok || !data.success) throw new Error(data?.error?.message || 'Registration failed.');
+  localStorage.setItem(SESSION_KEY, JSON.stringify(data.data));
+  return data.data;
+};
+
 export const login = async (email, password) => {
   const { ok, data } = await post('/api/auth/login', { email, password });
   if (!ok || !data.success) throw new Error(data?.error?.message || 'Login failed.');

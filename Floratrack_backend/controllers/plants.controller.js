@@ -15,7 +15,12 @@ const getAllPlants = async (req, res) => {
 
   try {
     const where = {};
+    const headerUserId = parseId(req.headers['x-user-id']);
+    const userRole = req.headers['x-user-role'];
+    const canViewAll = userRole === 'admin' || userRole === 'manager';
+
     if (userId) where.userId = parseId(userId);
+    else if (headerUserId && !canViewAll) where.userId = headerUserId;
     if (healthStatus) where.healthStatus = healthStatus;
     if (location) where.location = { [Op.like]: location };
 

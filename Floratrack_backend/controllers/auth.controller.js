@@ -1,5 +1,5 @@
 const { Op } = require('sequelize');
-const { User } = require('../models');
+const { User, UserSettings } = require('../models');
 const { sendSuccess, sendError } = require('../src/utils/response');
 const { formatUser } = require('../src/utils/formatters');
 
@@ -10,6 +10,58 @@ const toSession = (user) => ({
   userRole: user.userRole,
   email: user.email
 });
+
+const register = async (req, res) => {
+  const { firstName, lastName, email, password } = req.body;
+
+  const missing = ['firstName', 'lastName', 'email', 'password'].filter((f) => !req.body[f]);
+  if (missing.length) {
+    return sendError(res, 400, 'VALIDATION_ERROR', `Missing required fields: ${missing.join(', ')}.`, { fields: missing });
+  }
+
+  const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRe.test(email)) {
+    return sendError(res, 400, 'VALIDATION_ERROR', 'Enter a valid email address.', { fields: ['email'] });
+  }
+
+  if (password.length < 6) {
+    return sendError(res, 400, 'VALIDATION_ERROR', 'Password must be at least 6 characters.', { fields: ['password'] });
+  }
+
+  try {
+    const existing = await User.findOne({ where: { email: { [Op.eq]: email } } });
+    if (existing) {
+      return sendError(res, 409, 'CONFLICT', 'An account with this email already exists.');
+    }
+
+    const now = new Date();
+    const user = await User.create({
+      firstName,
+      lastName,
+      email,
+      password,
+      userRole: 'user',
+      createDate: now,
+      updateDate: now
+    });
+
+    await UserSettings.create({
+      userId: user.userId,
+      displayName: `${firstName} ${lastName}`,
+      email,
+      theme: 'light',
+      language: 'English',
+      notificationsEnabled: true
+    });
+
+    sendSuccess(res, toSession(formatUser(user)), 201);
+  } catch (err) {
+    if (err.name === 'SequelizeUniqueConstraintError') {
+      return sendError(res, 409, 'CONFLICT', 'An account with this email already exists.');
+    }
+    sendError(res, 500, 'INTERNAL_SERVER_ERROR', err.message);
+  }
+};
 
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -54,4 +106,4 @@ const getCurrentUser = async (req, res) => {
   }
 };
 
-module.exports = { login, logout, getCurrentUser };
+module.exports = { register, login, logout, getCurrentUser };

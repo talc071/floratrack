@@ -44,26 +44,30 @@
   margin-top: 8px;
 }
 
-.login-hint {
-  margin-top: 28px;
+.login-footer {
+  margin-top: 24px;
   padding-top: 20px;
   border-top: 1px solid var(--color-border);
+  text-align: center;
 }
 
-.login-hint p {
-  margin: 0 0 8px;
-  font-size: 0.8rem;
-  font-weight: 600;
+.login-footer p {
+  margin: 0;
+  font-size: 0.9rem;
   color: var(--color-text-muted);
 }
 
-.login-hint code {
-  display: block;
-  background: #f5f5f5;
-  padding: 5px 10px;
-  border-radius: 4px;
-  font-size: 0.78rem;
-  font-family: monospace;
+.login-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
   color: var(--color-primary-dark);
-  margin-bottom: 4px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.login-link:hover {
+  color: var(--color-primary);
 }

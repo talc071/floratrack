@@ -5,7 +5,7 @@ import Footer from '../components/Footer';
 import PlantCard from '../components/PlantCard';
 import DataTable from '../components/DataTable';
 import LiveNotifications from '../components/LiveNotifications';
-import { getAllPlants } from '../services/plantsService';
+import { getMyPlants } from '../services/plantsService';
 import { logCareAction } from '../services/careLogsService';
 import '../App.css';
 import './Dashboard.css';
@@ -59,7 +59,7 @@ function Dashboard() {
 
   const loadPlants = useCallback(() => {
     setLoading(true);
-    getAllPlants()
+    getMyPlants()
       .then(setPlants)
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
@@ -178,8 +178,20 @@ function Dashboard() {
 
             {filtered.length === 0 ? (
               <div className="empty-state">
-                <h3>No plants match this filter</h3>
-                <p>Try selecting a different health status above.</p>
+                {plants.length === 0 ? (
+                  <>
+                    <h3>No plants yet</h3>
+                    <p>Add your first plant to get started.</p>
+                    <button className="btn btn-primary" style={{ marginTop: 12 }} onClick={() => navigate('/plants/add')}>
+                      + Add Plant
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <h3>No plants match this filter</h3>
+                    <p>Try selecting a different health status above.</p>
+                  </>
+                )}
               </div>
             ) : (
               <div className="cards-grid">
@@ -201,7 +213,7 @@ function Dashboard() {
             <DataTable
               columns={TABLE_COLUMNS}
               data={plants}
-              emptyMessage="No plants found in the system."
+              emptyMessage="You have no plants yet. Add one from the dashboard."
             />
           </>
         )}

@@ -122,11 +122,20 @@ REACT_APP_SOCKET_URL=http://localhost:3000
 
 ## Demo Accounts (after seed)
 
-| Email | Password | Role |
-|-------|----------|------|
-| alice@floratrack.com | admin123 | admin |
-| bob@floratrack.com | manager123 | manager |
-| carol@floratrack.com | user123 | user |
+Use these credentials on the login page. Demo passwords are **not** shown in the UI — they are listed here only.
+
+| Email | Password | Role | Notes |
+|-------|----------|------|-------|
+| alice@floratrack.com | admin123 | admin | Sees **all** seeded plants (full demo dashboard) |
+| bob@floratrack.com | manager123 | manager | Sees **all** seeded plants (full demo dashboard) |
+| carol@floratrack.com | user123 | user | Sees only her own plants (Monstera, Cactus) |
+| frank@floratrack.com | freshstart123 | user | **No plants** — empty dashboard for trying the app from scratch |
+
+### Register a new account
+
+On the login page, click **Create an account** to register with your name, email, and password. New accounts start with role `user`, default settings, and **no plants** — the dashboard and calendar show only plants you own (empty until you add one). Admin and manager accounts see all plants in the system.
+
+**API:** `POST /api/auth/register` with `{ firstName, lastName, email, password }` (password min. 6 characters). `GET /plants` returns all plants for admin/manager roles, or only the signed-in user's plants for regular users.
 
 ---
 
@@ -134,7 +143,7 @@ REACT_APP_SOCKET_URL=http://localhost:3000
 
 | Route | Page | Description |
 |-------|------|-------------|
-| `/login` | Login | Email + password authentication |
+| `/login` | Login | Sign in or create a new account (no demo credentials shown on page) |
 | `/` | Dashboard | Plant overview, live activity feed, watering alerts, cards, stats, table |
 | `/plants/add` | Add Plant | Form + AI species identification (via secure backend) |
 | `/plants/:id` | Plant Profile | Details, edit/delete (role-based), care log timeline, shared users |
@@ -270,6 +279,7 @@ All responses use a consistent JSON envelope:
 | POST | `/plants` | any role | Create plant |
 | PUT | `/plants/:id` | admin, manager | Update plant |
 | DELETE | `/plants/:id` | admin | Delete plant |
+| POST | `/api/auth/register` | — | Register new user (starts with no plants) |
 | POST | `/api/auth/login` | — | Login |
 | POST | `/api/auth/logout` | — | Logout |
 | GET | `/api/users/me` | x-user-id | Current user |

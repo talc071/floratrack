@@ -1,9 +1,18 @@
 import { get, post, put, del } from './api';
+import { getSession } from './authService';
 
 const handleResponse = (result, fallback) => {
   const { ok, data } = result;
   if (!ok || !data.success) throw new Error(data?.error?.message || fallback);
   return data.data;
+};
+
+export const getMyPlants = async (filters = {}) => {
+  const session = getSession();
+  if (!session?.userId) throw new Error('Not authenticated.');
+  const isStaff = session.userRole === 'admin' || session.userRole === 'manager';
+  if (isStaff) return getAllPlants(filters);
+  return getAllPlants({ ...filters, userId: session.userId });
 };
 
 export const getAllPlants = async (filters = {}) => {

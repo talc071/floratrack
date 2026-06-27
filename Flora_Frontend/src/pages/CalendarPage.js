@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { getAllPlants } from '../services/plantsService';
+import { getMyPlants } from '../services/plantsService';
 import '../App.css';
 import './CalendarPage.css';
 
@@ -55,7 +55,7 @@ function CalendarPage() {
   const [selected, setSelected] = useState(null);
 
   useEffect(() => {
-    getAllPlants()
+    getMyPlants()
       .then(setPlants)
       .finally(() => setLoading(false));
   }, []);

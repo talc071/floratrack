@@ -7,7 +7,8 @@ const seedUsers = [
   { firstName: 'Bob', lastName: 'Bloom', email: 'bob@floratrack.com', password: 'manager123', userRole: 'manager' },
   { firstName: 'Carol', lastName: 'Rose', email: 'carol@floratrack.com', password: 'user123', userRole: 'user' },
   { firstName: 'David', lastName: 'Fern', email: 'david@floratrack.com', password: 'user123', userRole: 'user' },
-  { firstName: 'Eva', lastName: 'Sprout', email: 'eva@floratrack.com', password: 'user123', userRole: 'user' }
+  { firstName: 'Eva', lastName: 'Sprout', email: 'eva@floratrack.com', password: 'user123', userRole: 'user' },
+  { firstName: 'Frank', lastName: 'Fresh', email: 'frank@floratrack.com', password: 'freshstart123', userRole: 'user' }
 ];
 
 const seedPlants = [
